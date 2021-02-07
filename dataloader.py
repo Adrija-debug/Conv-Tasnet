@@ -22,7 +22,7 @@ class TasNetDataLoader():
         self.batch_size = batch_size
         self.sample_rate = sample_rate
 
-        if not os.path.isfile(self.tfr):
+        if not os.path.isfile(self.tfr) or os.stat(self.tfr).st_size == 0:
             self._encode()
 
     def _float_list_feature(self, value):
@@ -34,7 +34,7 @@ class TasNetDataLoader():
             dataset = tf.data.TFRecordDataset(self.tfr).map(self._decode)
             if self.mode == "train":
                 dataset = dataset.shuffle(2000 + 3 * self.batch_size)
-            dataset = dataset.batch(self.batch_size,drop_remainder=True)
+            dataset = dataset.batch(self.batch_size, drop_remainder=True)
             dataset = dataset.prefetch(self.batch_size * 5)
             self.iterator = dataset.make_initializable_iterator()
             return self.iterator.get_next()
@@ -45,14 +45,26 @@ class TasNetDataLoader():
             mix_wav_dir = os.path.join(self.wav_dir, "mix")
             s1_wav_dir = os.path.join(self.wav_dir, "s1")
             s2_wav_dir = os.path.join(self.wav_dir, "s2")
-            filenames = os.listdir(mix_wav_dir)
-            for filename in tqdm(filenames):
+            mixfilenames = os.listdir(mix_wav_dir)
+            #print(mixfilenames)
+            #input()
+            s1filenames = os.listdir(s1_wav_dir)
+            #print(s1filenames)
+            #input()
+            s2filenames = os.listdir(s2_wav_dir)
+            #print(s2filenames)
+            #input()
+            
+            total_files = len(mixfilenames)
+            print(total_files)
+            for index in tqdm(range(total_files)):
+                
                 mix, _ = librosa.load(
-                    os.path.join(mix_wav_dir, filename), self.sample_rate)
+                    os.path.join(mix_wav_dir, mixfilenames[index]), self.sample_rate)
                 s1, _ = librosa.load(
-                    os.path.join(s1_wav_dir, filename), self.sample_rate)
+                    os.path.join(s1_wav_dir, s1filenames[index]), self.sample_rate)
                 s2, _ = librosa.load(
-                    os.path.join(s2_wav_dir, filename), self.sample_rate)
+                    os.path.join(s2_wav_dir, s2filenames[index]), self.sample_rate)
 
                 # def padding(inputs):
                 #     return np.pad(
@@ -74,16 +86,12 @@ class TasNetDataLoader():
 
                 now_length = mix.shape[-1]
 
-                # if now_length < int(4 * self.sample_rate):
-                #     continue
-                # target_length = int(4 * self.sample_rate)
-                # stride = int(4 * self.sample_rate)
-
-                if now_length < int(4 * self.sample_rate):
+                if now_length < int(10 * self.sample_rate):
                     continue
-                target_length = int(4 * self.sample_rate)
-                stride = int(4 * self.sample_rate)
-                for i in range(0, now_length - target_length, stride):
+                target_length = int(10 * self.sample_rate)
+                stride = int(10 * self.sample_rate)
+                
+                for i in range(0, now_length - target_length + 1, stride):
                     write(i, i + target_length)
                 # if now_length // target_length:
                 #     write(now_length - target_length, now_length)
