@@ -36,69 +36,34 @@ def read_log(log_file):
 
 
 def setup():
-    parser = argparse.ArgumentParser(description='Audio Segmentation')
+    """
+     Args:
+        N (integer): Number of filters in autoencoder
+        L (integer): Length of the filters (in samples)
+        B (integer): Number of the channels in bottleneck 1x1-conv block
+        H (integer): Number of channels in convolutional blocks
+        P (integer): Kernel size in convolutional blocks
+        X (integer): Number of convolutional blocks in each repeat
+        R (integer): Number of repeats
+    """
+    parser = argparse.ArgumentParser(description='ConvTasNet - Audio Segmentation')
     parser.add_argument('-bs', '--batch_size', type=int, default=2)
-    parser.add_argument('-dd', '--data_dir', type=str, default='./data')
+    parser.add_argument('-dd', '--data_dir', type=str, default='.\data')
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
-    parser.add_argument('-ld', '--log_dir', type=str, default='logdir')
-    parser.add_argument('-me', '--max_epoch', type=int, default=100)
+    parser.add_argument('-ld', '--log_dir', type=str, default='.\logs')
+    parser.add_argument('-me', '--max_epoch', type=int, default=100//10)
     parser.add_argument('-mo', '--mode', type=str, default='train')
     parser.add_argument('-sr', '--sample_rate', type=int, default=8000)
 
-    parser.add_argument('-N', '-N', type=int, default=256)
+    parser.add_argument('-N', '-N', type=int, default=256//2)
     parser.add_argument('-L', '-L', type=int, default=20)
-    parser.add_argument('-B', '-B', type=int, default=256)
-    parser.add_argument('-H', '-H', type=int, default=512)
+    parser.add_argument('-B', '-B', type=int, default=256//4)
+    parser.add_argument('-H', '-H', type=int, default=512//4)
     parser.add_argument('-P', '-P', type=int, default=3)
-    parser.add_argument('-X', '-X', type=int, default=8)
-    parser.add_argument('-R', '-R', type=int, default=4)
+    parser.add_argument('-X', '-X', type=int, default=8//2)
+    parser.add_argument('-R', '-R', type=int, default=4//2)
 
     args = parser.parse_args()
-
-    args.log_file = os.path.join(args.log_dir, 'log.txt')
-    args.arg_file = os.path.join(args.log_dir, 'args.json')
-    args.checkpoint_path = os.path.join(args.log_dir, 'model.ckpt')
-
-    if args.mode != 'train':
-        args.batch_size = 1
-
-    if not os.path.isdir(args.log_dir):
-        os.makedirs(args.log_dir)
-        json.dump(vars(args), open(args.arg_file, 'w'), indent=4)
-
-    logger = logging.getLogger()
-    logger.addHandler(logging.FileHandler(args.log_file))
-    logger.addHandler(logging.StreamHandler(sys.stdout))
-    logger.setLevel(logging.INFO)
-
-    return args, logger
-
-
-# add by jiaxp@20190612
-def mySetup():
-    data_path = "/media/aa/data/WSJ0/2speakers/wav8k/min"
-    log_path = "./log"
-    mode = "train"     #choose model type
-
-    parser = argparse.ArgumentParser(description='Audio Segmentation')
-    parser.add_argument('-f', '--file_path', type=str, default='')
-    args = parser.parse_args()
-
-    args.batch_size = 2 
-    args.data_dir = data_path
-    args.learning_rate = 1e-3
-    args.log_dir = log_path
-    args.max_epoch = 100
-    args.mode = mode
-    args.sample_rate = 8000
-
-    args.N = 512
-    args.L = 16
-    args.B = 128
-    args.H = 512
-    args.P = 3
-    args.X = 8
-    args.R = 3
 
     args.log_file = os.path.join(args.log_dir, 'log.txt')
     args.arg_file = os.path.join(args.log_dir, 'args.json')
