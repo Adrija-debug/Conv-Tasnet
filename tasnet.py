@@ -5,7 +5,15 @@ from itertools import permutations
 import numpy as np
 
 ''' change the model, instead of recieving dataloader as input, use one
-    placeholer data_input. 
+    placeholer data_input.
+     Args:
+        N (integer): Number of filters in autoencoder
+        L (integer): Length of the filters (in samples)
+        B (integer): Number of the channels in bottleneck 1x1-conv block
+        H (integer): Number of channels in convolutional blocks
+        P (integer): Kernel size in convolutional blocks
+        X (integer): Number of convolutional blocks in each repeat
+        R (integer): Number of repeats
 '''
 class TasNet:
     def __init__(self, mode, data_input, layers, n_speaker, N, L, B, H, P, X,
@@ -47,16 +55,16 @@ class TasNet:
         input_audio = audios[:, 0, :]
 
         self.single_audios = single_audios = tf.unstack(
-            audios[:, 1:, :], axis=1)
+            audios[:, 1:, :], axis=1) 
 
         with tf.variable_scope("encoder"):
             # encoded_input: [batch_size, some len, N]
             encoded_input = self.layers["conv1d_encoder"](
                 inputs=tf.expand_dims(input_audio, -1))
             # mod by jxp@20190612, replace 8000 with self.sample_rate
-            # self.encoded_len = (int(4 * 8000) - self.L) // (
+            # self.encoded_len = (int(10 * 8000) - self.L) // (
             #     self.L // 2) + 1
-            self.encoded_len = (int(4 * self.sample_rate) - self.L) // (
+            self.encoded_len = (int(10 * self.sample_rate) - self.L) // (
                 self.L // 2) + 1
 
         with tf.variable_scope("bottleneck"):
