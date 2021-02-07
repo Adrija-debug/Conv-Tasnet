@@ -2,9 +2,7 @@
 """
 Created on 20181010
 @author: jiaxp
-
 my python lib for speech signal processing, includes the following functions:
-
 listFile:       get the files with certain appendix in the target path
 enframe
 overlapAdd
