@@ -2,6 +2,7 @@
 import os
 import tensorflow as tf
 import librosa
+import soundfile as sf
 import numpy as np
 import logging
 import shutil
@@ -11,7 +12,7 @@ import sys
 from dataloader import TasNetDataLoader
 from tasnet import TasNet
 from utils import create_dir, print_num_of_trainable_parameters
-from utils import read_log, mySetup
+from utils import read_log, setup
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
@@ -42,7 +43,7 @@ def average_gradients(tower_grads):
 
 
 if __name__ == '__main__':
-    args, logger = mySetup()
+    args, logger = setup()
     
     if os.path.isdir(args.log_dir) and FLAG_RETRAIN==False:
         shutil.rmtree(args.log_dir)
@@ -282,11 +283,10 @@ if __name__ == '__main__':
                     ]
 
                     def write(inputs, filename):
-                        librosa.output.write_wav(
+                        sf.write(
                             now_dir + filename,
                             inputs,
-                            args.sample_rate,
-                            norm=True)
+                            args.sample_rate)
 
                     write(outputs[0], 's1.wav')
                     write(outputs[1], 's2.wav')
